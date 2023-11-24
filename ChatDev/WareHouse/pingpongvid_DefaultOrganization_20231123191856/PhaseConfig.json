@@ -180,7 +180,7 @@
       "# Release the VideoWriter object",
       "video_writer.release()",
 
-      "print(f\"Video saved!\")",
+      "print(f\"Video saved as {video_filename}\")",
       "```",
       "Now, use some or all of the pictures into the GUI to make it more beautiful and creative. Output codes strictly following the required format mentioned above."
     ]

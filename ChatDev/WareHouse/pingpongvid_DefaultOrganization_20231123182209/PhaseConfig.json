@@ -98,91 +98,21 @@
       "'''",
       "CODE",
       "```",
-      "As the {assistant_role}, to satisfy the new user's demand and equip the software with a beautiful graphical user interface (GUI), you will incorporate our designed images for GUI decoration. Here are some ready-made high-quality pictures and corresponding descriptions:",
+      "As the {assistant_role}, to satisfy the new user's demand and equip the software with a beautiful graphical user interface (GUI), you will incorporate our designed images into a video for GUI decoration. Here are some ready-made high-quality pictures and corresponding descriptions to make a video:",
       "{images}",
-      "Note that the designed images have a fixed size of 256x256 pixels and the images are located in the same directory as all the Python files; please dynamically scaling these images according to the size of GUI, and use \"self.*\" to avoid displaying-related problems caused by automatic garbage collection. For example:",
+      "You must first make a video file from the images. Note that the designed images have a fixed size of 256x256 pixels and the images are located in the same directory as all the Python files; please dynamically scale the compiled video according to the size of GUI, and use \"self.*\" to avoid displaying-related problems caused by automatic garbage collection. For example:",
       "```",
-      "self.image = ImageTk.PhotoImage(Image.open(\"./image.png\").resize((50, 50)))",
+      "video_name = \"test.mkv\" #This is your video file path",
+      "video = imageio.get_reader(video_name)",
+      "def stream(label):",
+
+      "for image in video.iter_data():",
+      "    frame_image = ImageTk.PhotoImage(Image.fromarray(image))",
+      "    label.config(image=frame_image)",
+      "    label.image = frame_image",
+
       "```",
-      "Now, use some or all of the pictures into the GUI to make it more beautiful and creative. Output codes strictly following the required format mentioned above."
-    ]
-  },
-  "VideoDesign": {
-    "assistant_role_name": "Programmer",
-    "user_role_name": "Chief Creative Officer",
-    "phase_prompt": [
-      "Our developed source codes and corresponding test reports are listed below: ",
-      "Task: \"{task}\".",
-      "Programming Language: \"{language}\"",
-      "Source Codes:",
-      "\"{codes}\"",
-      "Note that each file must strictly follow a markdown code block format, where the following tokens must be replaced such that \"FILENAME\" is the lowercase file name including the file extension, \"LANGUAGE\" in the programming language, \"DOCSTRING\" is a string literal specified in source code that is used to document a specific segment of code, and \"CODE\" is the original code:",
-      "FILENAME",
-      "```LANGUAGE",
-      "'''",
-      "DOCSTRING",
-      "'''",
-      "CODE",
-      "```",
-      "As the {assistant_role}, to satisfy the new user's demand and equip the software with a beautiful graphical user interface (GUI), we will use the previous images generated to formulate a beautiful video stream. Now, we keep discussing the GUI beautification by listing some functionally independent elements in GUI that are being considered to be decorated by a video generated from a collection of images. For example, a video cycling through a list of digits(0-9) is functionally independent.",
-      "To answer, use the format: \" FILENAME.png: DESCRIPTION\" where \"FILENAME\" is the filename of the image and \"DESCRIPTION\" denotes the detailed description of the independent elements. For example:",
-      "'''",
-      "button_1.mp4: A video composed of previous button images\"1\" on it.",
-      "button_multiply.mp4: A video composed of previous button operations (\"*\") on it.",
-      "background.mp4: A moving background video composed from a series of background images",
-      "'''",
-      "Now, list all functionally independent elements as much as possible."
-    ]
-  },
-  "VideoIntegration": {
-    "assistant_role_name": "Programmer",
-    "user_role_name": "Chief Technology Officer",
-    "phase_prompt": [
-      "Our developed source codes and corresponding test reports are listed below: ",
-      "Task: \"{task}\".",
-      "Programming Language: \"{language}\"",
-      "Source Codes:",
-      "\"{codes}\"",
-      "Note that each file must strictly follow a markdown code block format, where the following tokens must be replaced such that \"FILENAME\" is the lowercase file name including the file extension, \"LANGUAGE\" in the programming language, \"DOCSTRING\" is a string literal specified in source code that is used to document a specific segment of code, and \"CODE\" is the original code:",
-      "FILENAME",
-      "```LANGUAGE",
-      "'''",
-      "DOCSTRING",
-      "'''",
-      "CODE",
-      "```",
-      "As the {assistant_role}, to satisfy the new user's demand and equip the software with a beautiful graphical user interface (GUI), you will incorporate our designed videos for GUI decoration. Here are some ready-made high-quality pictures and corresponding descriptions:",
-      "{videos}",
-      "Note that the designed videos have a fixed frame size of 256x256 pixels and the images leading to the videos being created are located in the same directory as all the Python files; please dynamically scaling these video streams according to the size of GUI, and use \"self.*\" to avoid displaying-related problems caused by automatic garbage collection. For example:",
-      "```",
-      "# Path to the directory containing your images",
-      "images_directory = 'path/to/your/images'",
-
-      "# Get the list of image files in the directory",
-      "image_files = [f for f in os.listdir(images_directory) if f.endswith('.jpg') or f.endswith('.png')]",
-
-      "# Sort the image files to ensure they are in the correct order",
-      "image_files.sort()",
-
-      "# Create a VideoWriter object",
-      "video_filename = 'output_video.avi'",
-      "fourcc = cv2.VideoWriter_fourcc(*'XVID')",
-      "video_writer = cv2.VideoWriter(video_filename, fourcc, 1.0, (640, 480))  # You can adjust the frame rate and resolution",
-
-      "# Loop through each image and write it to the video",
-      "for image_file in image_files:",
-      "    image_path = os.path.join(images_directory, image_file)",
-      "    img = cv2.imread(image_path)",
-      "    # Resize the image if needed",
-      "    # img = cv2.resize(img, (640, 480))",
-      "    video_writer.write(img)",
-
-      "# Release the VideoWriter object",
-      "video_writer.release()",
-
-      "print(f\"Video saved!\")",
-      "```",
-      "Now, use some or all of the pictures into the GUI to make it more beautiful and creative. Output codes strictly following the required format mentioned above."
+      "Now, use some or all of the pictures into the GUI to make a nice video window in the game. Output codes strictly following the required format mentioned above."
     ]
   },
   "CodeComplete": {

@@ -174,6 +174,19 @@ class Art(ComposedPhase):
 
     def break_cycle(self, chat_env) -> bool:
         return False
+    
+class Video(ComposedPhase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def update_phase_env(self, chat_env):
+        pass
+
+    def update_chat_env(self, chat_env):
+        return chat_env
+
+    def break_cycle(self, chat_env) -> bool:
+        return False
 
 
 class CodeCompleteAll(ComposedPhase):
