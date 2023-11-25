@@ -7,22 +7,22 @@ PIPE = DiffusionPipeline.from_pretrained(
     "prompthero/openjourney", 
     torch_dtype=torch.float32
 )
-PIPE.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+PIPE.scheduler = DPMSolverMultistepScheduler.from_config(PIPE.scheduler.config)
 PIPE.vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse", torch_dtype=torch.float32)
 NOISE_SCHEDULER = DDPMScheduler()
 DENOISE_STEPS = 5
 DIMENSIONS = (400, 600)
 
 def decode_latent(latent):
-    images = PIPE.vae.decode(latent / pipe.vae.config.scaling_factor)[0].detach()
+    images = PIPE.vae.decode(torch.unsqueeze(latent, dim=0) / PIPE.vae.config.scaling_factor)[0].detach()
     do_denormalize = None
     if do_denormalize is None:
-        do_denormalize = [pipe.image_processor.config.do_normalize] * images.shape[0]
+        do_denormalize = [PIPE.image_processor.config.do_normalize] * images.shape[0]
     images = torch.stack(
-        [pipe.image_processor.denormalize(images[i]) if do_denormalize[i] else images[i] for i in range(images.shape[0])]
+        [PIPE.image_processor.denormalize(images[i]) if do_denormalize[i] else images[i] for i in range(images.shape[0])]
     )
-    images_np = pipe.image_processor.pt_to_numpy(images)
-    images_pil = pipe.numpy_to_pil(images_np)
+    images_np = PIPE.image_processor.pt_to_numpy(images)
+    images_pil = PIPE.numpy_to_pil(images_np)
     return images_pil[0]
 
 def noise_latent(input_latent):
@@ -54,7 +54,7 @@ def generate_frames(prompt1, prompt2, num_frames):
     output_latent2 = denoise_latent(input_latent, prompt=prompt2)
     frames = []
     latent_step_vector = (output_latent2 - output_latent1) / (num_frames - 1)
-    for i in num_frames:
+    for i in range(num_frames):
         frame = decode_latent(output_latent1 + i * latent_step_vector)
         frames.append(frame)
     return frames
@@ -72,4 +72,4 @@ if __name__ == "__main__":
     prompt2 = "Underwater coral reef. Majestic lighting. Hyper realism. Symmetric artwork. Cinematic. High detail. 8k. --ar 2:3"
     frames = generate_frames(prompt1, prompt2, 4)
     for i, frame in enumerate(frames):
-        frame.save("frame{i}.jpg")
+        frame.save(f"frame{i}.jpg")
