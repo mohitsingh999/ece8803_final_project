@@ -430,6 +430,43 @@ class VideoIntegration(Phase):
         log_and_print_online(
             "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
         return chat_env
+    
+class DiffusionArtDesign(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def update_phase_env(self, chat_env):
+        self.phase_env = {"task": chat_env.env_dict['task_prompt'],
+                          "language": chat_env.env_dict['language'],
+                          "codes": chat_env.get_codes()}
+
+
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        # print('CHAT ENV SELF SEMINAR CONCLUSION!!!!\n\n\n')
+        # print(self.seminar_conclusion, flush=True)
+        #exit() # Just for debugging 
+        chat_env.proposed_images = chat_env.get_proposed_images_from_diffusion_prompt(self.seminar_conclusion)
+        log_and_print_online(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+
+
+class DiffusionArtIntegration(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def update_phase_env(self, chat_env):
+        self.phase_env = {"task": chat_env.env_dict['task_prompt'],
+                          "language": chat_env.env_dict['language'],
+                          "codes": chat_env.get_codes()}
+
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.update_codes(self.seminar_conclusion)
+        chat_env.rewrite_codes("Finish Art Integration")
+        # chat_env.generate_images_from_codes()
+        log_and_print_online(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
 
 class CodeComplete(Phase):
     def __init__(self, **kwargs):

@@ -14,6 +14,9 @@ from chatdev.documents import Documents
 from chatdev.roster import Roster
 from chatdev.utils import log_and_print_online
 
+# For diffusion model and video generation 
+from artist import generate_frames
+import cv2
 
 class ChatEnvConfig:
     def __init__(self, clear_structure,
@@ -268,3 +271,91 @@ class ChatEnv:
                 download(image_url, filename)
 
         return images
+
+    def images_to_video(self, image_folder, output_video_path, fps):
+        images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
+        frame = cv2.imread(os.path.join(image_folder, images[0]))
+        height, width, layers = frame.shape
+
+        video = cv2.VideoWriter(output_video_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
+
+        for i in range(500):
+            for image in images:
+                video.write(cv2.imread(os.path.join(image_folder, image)))
+
+            for image in reversed(images):
+                video.write(cv2.imread(os.path.join(image_folder, image)))
+
+        print('Generated Video w/ Diffused Images')
+        cv2.destroyAllWindows()
+        video.release()
+    
+    def get_proposed_images_from_diffusion_prompt(self, messages):
+        # def download(img_url, file_name):
+        #     r = requests.get(img_url)
+        #     filepath = os.path.join(self.env_dict['directory'], file_name)
+        #     if os.path.exists(filepath):
+        #         os.remove(filepath)
+        #     with open(filepath, "wb") as f:
+        #         f.write(r.content)
+        #         print("{} Downloaded".format(filepath))
+        
+        regex = r": .+\n"
+        matches = re.finditer(regex, messages, re.DOTALL)
+        for match in matches:
+            print('Prompt')
+            prompt_list_raw = match.string.split('\n')
+            prompt_list_raw = [i for i in prompt_list_raw if i]
+
+        prompt_list = []
+        for prompt in prompt_list_raw:
+            prompt = prompt.replace("prompt_1: ", "")
+            prompt = prompt.replace("prompt_2: ", "")
+            prompt_list.append(prompt)
+
+        print(prompt_list)
+
+        # Pass the filtered prompts to the diffusion model 
+        frames = generate_frames(prompt_list[0], prompt_list[1], 10)
+
+        # Save the images locally
+        for i, frame in enumerate(frames):
+            frame.save(os.path.join(self.env_dict['directory'], f"frame{i}.jpg"))
+            print(f"Downloaded frame{i}.jpg!")
+
+        # Save an mp4 that combines the previous images
+        self.images_to_video(self.env_dict['directory'], os.path.join(self.env_dict['directory'], f"background.mp4"), 5)
+
+        #exit()
+        # images = {}
+        # for match in matches:
+        #     filename = match.group(1).strip()
+        #     desc = match.group(2).strip()
+        #     images[filename] = desc
+
+        # if len(images.keys()) == 0:
+        #     regex = r"(\w+.png)"
+        #     matches = re.finditer(regex, messages, re.DOTALL)
+        #     images = {}
+        #     for match in matches:
+        #         filename = match.group(1).strip()
+        #         desc = " ".join(filename.replace(".png", "").split("_"))
+        #         images[filename] = desc
+        #         print("{}: {}".format(filename, images[filename]))
+
+        # for filename in images.keys():
+        #     if not os.path.exists(os.path.join(self.env_dict['directory'], filename)):
+        #         desc = images[filename]
+        #         if desc.endswith(".png"):
+        #             desc = desc.replace(".png", "")
+        #         print("{}: {}".format(filename, desc))
+        #         response = openai.Image.create(
+        #             prompt=desc,
+        #             n=1,
+        #             size="256x256"
+        #         )
+        #         time.sleep(30) #To avoid rate limit 
+        #         image_url = response['data'][0]['url']
+        #         download(image_url, filename)
+
+        return frames
