@@ -2,6 +2,8 @@ from diffusers import DiffusionPipeline, DPMSolverMultistepScheduler, DDPMSchedu
 import torch
 import random
 from PIL import Image
+import cv2
+import os 
 
 PIPE = DiffusionPipeline.from_pretrained(
     "prompthero/openjourney", 
@@ -67,9 +69,30 @@ def generate_frames_no_guidance(prompt, num_frames):
 def generate_frames_new_guidance(prompt1, prompt2, num_frames):
     pass
 
+def images_to_video(image_folder, output_video_path, fps):
+    images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
+    frame = cv2.imread(os.path.join(image_folder, images[0]))
+    height, width, layers = frame.shape
+
+    video = cv2.VideoWriter(output_video_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
+
+    for i in range(100):
+        for image in images:
+            video.write(cv2.imread(os.path.join(image_folder, image)))
+
+        for image in reversed(images):
+            video.write(cv2.imread(os.path.join(image_folder, image)))
+
+    print('Generated Video w/ Diffused Images')
+    cv2.destroyAllWindows()
+    video.release()
+
 if __name__ == "__main__":
     prompt1 = "Jungle with vines. Majestic lighting. Hyper realism. Symmetric artwork. Cinematic. High detail. 8k. --ar 2:3"
     prompt2 = "Underwater coral reef. Majestic lighting. Hyper realism. Symmetric artwork. Cinematic. High detail. 8k. --ar 2:3"
     frames = generate_frames(prompt1, prompt2, 4)
     for i, frame in enumerate(frames):
         frame.save(f"frame{i}.jpg")
+
+    artist_dir = '/mnt/c/mohit/GT/ECE8803-ML/final_projectECE8803/ece8803_final_project/ChatDev'
+    images_to_video(artist_dir, os.path.join(artist_dir, f"jungleunderwater.mp4"), 15)

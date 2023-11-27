@@ -26,7 +26,9 @@ class Game:
         self.enemies.add(self.enemy2)
         self.enemies.add(self.enemy3)
     def run(self):
+        i = 0
         while self.running:
+            i += 1
             # Check for collisions
             collisions = pygame.sprite.spritecollide(self.player, self.enemies, False)
             if collisions:
@@ -34,7 +36,8 @@ class Game:
                 self.running=False
             self.clock.tick(60)
 
-            self.success, self.video_image = self.video.read()
+            if i % 6 == 0:
+                self.success, self.video_image = self.video.read()
             if self.success:
                 self.video_surf = pygame.image.frombuffer(self.video_image.tobytes(), self.video_image.shape[1::-1], "BGR")
             else:
